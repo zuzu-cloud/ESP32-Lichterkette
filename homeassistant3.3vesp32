@@ -1,0 +1,49 @@
+esphome:
+  name: esp32
+  friendly_name: ESP32
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino  # DAC nur im Arduino-Framework verfügbar
+
+logger:
+
+api:
+  encryption:
+    key: "f0E0oMqDRRRFx97BF3rm9y0NsE/iL7rUdmltHs09njc="
+
+ota:
+  platform: esphome
+  password: "9b746ec838437c169ee839223cf4862a"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  ap:
+    ssid: "Esp32 Fallback Hotspot"
+    password: "I6KL6lW3Ui1l"
+
+captive_portal:
+
+# Echter DAC-Ausgang über GPIO25 (0–3.3 V)
+output:
+  - platform: esp32_dac
+    pin: GPIO25
+    id: dac_output
+
+# Schaltfläche EIN/AUS
+switch:
+  - platform: template
+    name: "Lichterkette EIN/AUS"
+    id: licht_schalter
+    optimistic: true
+    turn_on_action:
+      - output.set_level:
+          id: dac_output
+          level: 1.0  # 100 % = 3.3 V
+    turn_off_action:
+      - output.set_level:
+          id: dac_output
+          level: 0.0  # 0 % = 0 V
